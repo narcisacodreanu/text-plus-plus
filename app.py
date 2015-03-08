@@ -6,6 +6,9 @@ import requests
 app = Flask(__name__)
 app.config["DEBUG"] = True  # Only include this while you are testing your app
 
+def fun():
+	as;ldjf
+
 @app.route("/")
 def home():
 	return "Hello World"
