@@ -14,6 +14,7 @@ import random
 from bs4 import BeautifulSoup
 import nltk
 from nltk import word_tokenize,pos_tag 
+from twilio.rest import TwilioRestClient
 
 app = Flask(__name__)
 app.config["DEBUG"] = False  # Only include this while you are testing your app
@@ -34,15 +35,27 @@ def scrapeRhymeZone():
 		soup.select(".d")
 		rhymingWords = soup.select("font b a")
 		finalRhymingWords = []
-		for i in rhymingWords:
-			result = re.sub(str("<.*?>"), str(""), str(i))
+		for i in range(len(rhymingWords)):
+			result = re.sub(str("<.*?>"), str(""), str(rhymingWords[i]))
 			result = result.replace("\xc2\xa0", " ")
 			if not " " in result:
 				finalRhymingWords.append(result)	
 		finalString += finalRhymingWords[random.randint(0,len(finalRhymingWords)-1)] + " "
-	print(finalString)
+	return finalString
 
-scrapeRhymeZone()
+def sendText(text, mediaURL):
+	ACCOUNT_SID = "AC591d7f09e4a2c9c028c89d4f40488f49" 
+	AUTH_TOKEN = "68c447907fe59e086289a9c914ccce47"
+	client =  TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
+	client.messages.create(
+			to="5169966173", 
+			from_="+15168743771",
+			body=text,
+			media_url=mediaURL
+	)
+	return "sent"
+
+print(scrapeRhymeZone())
 
 def gifUrlGenerator(noun):
 	data = json.loads(urllib.urlopen("http://api.giphy.com/v1/gifs/search?q="+ noun + "&api_key=dc6zaTOxFJmzC&limit=5").read())
