@@ -19,13 +19,21 @@ from twilio.rest import TwilioRestClient
 app = Flask(__name__)
 app.config["DEBUG"] = False  # Only include this while you are testing your app
 
-sampleText = "Hey what are you doing tonight?"
+sampleText = "Today I went to the zoo!"
 
 def splitText(text):
 	return text.split()
 
-def scrapeRhymeZone():
-	words = splitText(sampleText.replace("?",""))
+def scrapeRhymeZone(text):
+	punctuations = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
+	no_punct = ""
+	last_punct = ""
+	for char in range(len(text)):
+		if text[char] not in punctuations:
+			no_punct = no_punct + text[char]
+		if text[char] in punctuations and char == len(text)-1:
+			last_punct = text[char]
+	words = splitText(no_punct)
 	baseURL = "http://www.rhymezone.com/r/rhyme.cgi?Word="
 	endURL = "&org1=syl&org2=l&org3=y&typeofrhyme=perfect"
 	finalString = ""
@@ -35,13 +43,16 @@ def scrapeRhymeZone():
 		soup.select(".d")
 		rhymingWords = soup.select("font b a")
 		finalRhymingWords = []
-		for i in range(len(rhymingWords)):
-			result = re.sub(str("<.*?>"), str(""), str(rhymingWords[i]))
-			result = result.replace("\xc2\xa0", " ")
-			if not " " in result:
-				finalRhymingWords.append(result)	
-		finalString += finalRhymingWords[random.randint(0,len(finalRhymingWords)-1)] + " "
-	return finalString
+		if len(rhymingWords) > 0:
+			for i in range(len(rhymingWords)):
+				result = re.sub(str("<.*?>"), str(""), str(rhymingWords[i]))
+				result = result.replace("\xc2\xa0", " ")
+				if not " " in result:
+					finalRhymingWords.append(result)	
+			finalString += finalRhymingWords[random.randint(0,len(finalRhymingWords)-1)] + " "
+		else:
+			finalString += i + " "
+	return finalString + last_punct
 
 def sendText(text, mediaURL):
 	ACCOUNT_SID = "AC591d7f09e4a2c9c028c89d4f40488f49" 
@@ -55,12 +66,10 @@ def sendText(text, mediaURL):
 	)
 	return "sent"
 
-print(scrapeRhymeZone())
-
 def gifUrlGenerator(noun):
 	data = json.loads(urllib.urlopen("http://api.giphy.com/v1/gifs/search?q="+ noun + "&api_key=dc6zaTOxFJmzC&limit=5").read())
 	#gif_response = json.dumps(data, sort_keys=True, indent=4)
-	gif_url = data["data"][0]["images"]["fixed_height"]["url"]
+	gif_url = data["data"][random.randint(0, len(data["data"])-1)]["images"]["fixed_height"]["url"]
 	return gif_url
 
 def getNoun(sampleText):
@@ -74,6 +83,8 @@ def getNoun(sampleText):
 	return noun
 	
 print gifUrlGenerator(getNoun(sampleText))
+print(sendText(scrapeRhymeZone(sampleText), gifUrlGenerator(getNoun(sampleText))))
+
 #.d~ a , .d , font b a
 
 @app.route("/")
