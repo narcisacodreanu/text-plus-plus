@@ -12,6 +12,8 @@ from urllib2 import urlopen
 import re
 import random
 from bs4 import BeautifulSoup
+import nltk
+from nltk import word_tokenize,pos_tag 
 from twilio.rest import TwilioRestClient
 
 app = Flask(__name__)
@@ -55,6 +57,23 @@ def sendText(text, mediaURL):
 
 print(scrapeRhymeZone())
 
+def gifUrlGenerator(noun):
+	data = json.loads(urllib.urlopen("http://api.giphy.com/v1/gifs/search?q="+ noun + "&api_key=dc6zaTOxFJmzC&limit=5").read())
+	#gif_response = json.dumps(data, sort_keys=True, indent=4)
+	gif_url = data["data"][0]["images"]["fixed_height"]["url"]
+	return gif_url
+
+def getNoun(sampleText):
+	text = word_tokenize(sampleText)
+	array = nltk.pos_tag(text)
+	t = tuple(i[1] for i in array)
+	noun = "funny"
+	for i in array:
+		if i[1] == "NN":
+			noun = i[0]
+	return noun
+	
+print gifUrlGenerator(getNoun(sampleText))
 #.d~ a , .d , font b a
 
 @app.route("/")
