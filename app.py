@@ -1,9 +1,17 @@
 __author__ = 'Ken and Narcisa'
-from flask import Flask, render_template, request
-from bs4 import BeautifulSoup
+
+from flask import Flask, jsonify, render_template, request, redirect
+from random import choice
+import argparse
+import json
+import pprint
+import sys
+import urllib
+import requests
 from urllib2 import urlopen
 import re
 import random
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 app.config["DEBUG"] = False  # Only include this while you are testing your app
@@ -40,8 +48,8 @@ def sendText():
 
 @app.route("/")
 def home():
-	return scrapeRhymeZone()
-
+#return "Hello World"
+	return render_template('hello.html')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
