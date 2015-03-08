@@ -12,6 +12,7 @@ from urllib2 import urlopen
 import re
 import random
 from bs4 import BeautifulSoup
+from twilio.rest import TwilioRestClient
 
 app = Flask(__name__)
 app.config["DEBUG"] = False  # Only include this while you are testing your app
@@ -40,9 +41,19 @@ def scrapeRhymeZone():
 		finalString += finalRhymingWords[random.randint(0,len(finalRhymingWords)-1)] + " "
 	return finalString
 
-def sendText():
-	return ""
+def sendText(text, mediaURL):
+	ACCOUNT_SID = "AC591d7f09e4a2c9c028c89d4f40488f49" 
+	AUTH_TOKEN = "68c447907fe59e086289a9c914ccce47"
+	client =  TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
+	client.messages.create(
+			to="5169966173", 
+			from_="+15168743771",
+			body=text,
+			media_url=mediaURL
+	)
+	return "sent"
 
+print(scrapeRhymeZone())
 
 #.d~ a , .d , font b a
 
