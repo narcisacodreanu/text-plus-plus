@@ -11,6 +11,7 @@ import requests
 from urllib2 import urlopen
 import re
 import random
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 app.config["DEBUG"] = False  # Only include this while you are testing your app
@@ -31,15 +32,17 @@ def scrapeRhymeZone():
 		soup.select(".d")
 		rhymingWords = soup.select("font b a")
 		finalRhymingWords = []
-		for i in rhymingWords:
-			result = re.sub(str("<.*?>"), str(""), str(i))
+		for i in range(len(rhymingWords)):
+			result = re.sub(str("<.*?>"), str(""), str(rhymingWords[i]))
 			result = result.replace("\xc2\xa0", " ")
 			if not " " in result:
 				finalRhymingWords.append(result)	
 		finalString += finalRhymingWords[random.randint(0,len(finalRhymingWords)-1)] + " "
-	print(finalString)
+	return finalString
 
-scrapeRhymeZone()
+def sendText():
+	return ""
+
 
 #.d~ a , .d , font b a
 
