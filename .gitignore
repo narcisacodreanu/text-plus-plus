@@ -9,4 +9,7 @@
 *.swp
 *.py~
 *.py.swp
+*.html~
+*.py.swm
+.gitignore~
 .vagrant

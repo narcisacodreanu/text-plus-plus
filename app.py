@@ -27,16 +27,21 @@ def splitText(text):
 def scrapeRhymeZone(text):
 	punctuations = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
 	no_punct = ""
-	last_punct = ""
-	for char in range(len(text)):
-		if text[char] not in punctuations:
-			no_punct = no_punct + text[char]
-		if text[char] in punctuations and char == len(text)-1:
-			last_punct = text[char]
-	words = splitText(no_punct)
+	punctuation = []
+	words = splitText(text)
+	for i in range(len(words)):
+		newWord = ""
+		for j in words[i]:
+			if j not in punctuations:
+				newWord = newWord + j
+			else:
+				punctuation.append((j,i))
+		i = newWord
+			
 	baseURL = "http://www.rhymezone.com/r/rhyme.cgi?Word="
 	endURL = "&org1=syl&org2=l&org3=y&typeofrhyme=perfect"
 	finalString = ""
+	finalWords = []
 	for i in words:
 		soup = BeautifulSoup(urlopen(baseURL + i + endURL))
 		soup.select(".d~ a")
@@ -49,10 +54,19 @@ def scrapeRhymeZone(text):
 				result = result.replace("\xc2\xa0", " ")
 				if not " " in result:
 					finalRhymingWords.append(result)	
-			finalString += finalRhymingWords[random.randint(0,len(finalRhymingWords)-1)] + " "
+			finalWords.append(finalRhymingWords[random.randint(0,len(finalRhymingWords)-1)])
 		else:
-			finalString += i + " "
-	return finalString + last_punct
+			finalWords.append(i)
+	for i in range(len(finalWords)):
+		finalString += finalWords[i]
+		for j in punctuation:
+			if j[1] == i:
+				finalString+=j[0]
+		if i != len(finalWords) - 1:
+			finalString += " "
+	print(finalWords)
+	return finalString
+
 
 def sendText(text, mediaURL, phone_number):
 	ACCOUNT_SID = "AC591d7f09e4a2c9c028c89d4f40488f49" 
@@ -69,7 +83,18 @@ def sendText(text, mediaURL, phone_number):
 def gifUrlGenerator(noun):
 	data = json.loads(urllib.urlopen("http://api.giphy.com/v1/gifs/search?q="+ noun + "&api_key=dc6zaTOxFJmzC&limit=5").read())
 	#gif_response = json.dumps(data, sort_keys=True, indent=4)
-	gif_url = data["data"][random.randint(0, len(data["data"])-1)]["images"]["fixed_height"]["url"]
+	appropriate = False
+	print(data["data"][0]["rating"])
+	while not appropriate:
+		if len(data["data"]) > 20:
+			randomNumber = random.randint(0,20)
+		else:
+			randomNumber = random.randint(0, len(data["data"])-1)
+		if data["data"][randomNumber]["rating"] is "r":
+			appropriate = False
+		else:
+			appropriate = True
+	gif_url = data["data"][randomNumber]["images"]["fixed_height"]["url"]
 	return gif_url
 
 def getNoun(sampleText):
@@ -78,7 +103,7 @@ def getNoun(sampleText):
 	t = tuple(i[1] for i in array)
 	noun = "funny"
 	for i in array:
-		if i[1] == "NN":
+		if "NN" in i[1]:
 			noun = i[0]
 	return noun
 	
@@ -100,6 +125,7 @@ def text():
 		rhymedText = scrapeRhymeZone(text)
 		gif_URL = gifUrlGenerator(getNoun(text))
 		sendText(rhymedText,gif_URL, phone_number)
+		print(getNoun(text))
 		return render_template("done.html", originalText=text,rhymedText=rhymedText, gif=gif_URL, phone=phone_number)
 	else:
 		return render_template("done.html")
