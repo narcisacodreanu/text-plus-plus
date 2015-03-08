@@ -40,7 +40,7 @@ body {
 	  		Send a text with text++
 	  </h1>
 	  <h2>Do something to your text bla bla!</h2>
-    <form action="/done" method="POST">
+    <form action="/page" method="POST">
           <div class="row">
            <div class="small-10 columns">
             <label for="user_search">Phone Number:</label>

@@ -1,4 +1,3 @@
-{% extends "base.html" %}
 <!-- hello.html -->
 {% block title %}Welcome | text++{% endblock %}
 
@@ -37,31 +36,12 @@ body {
   <div class="medium-10 medium-centered columns">
   	<div class="panel">
 	  <h1>
-	  		Send a text with text++
+	  		Text Sent to {{ phone }}:<br>
+			Original: {{ originalText }}<br>
+			Rhymed: {{ rhymedText }}<br>
+			GIF: {{ gif }}
 	  </h1>
-	  <h2>Do something to your text bla bla!</h2>
-    <form action="/done" method="POST">
-          <div class="row">
-           <div class="small-10 columns">
-            <label for="user_search">Phone Number:</label>
-            <input type="text" placeholder = "insert the phone number here" name="user_search" required/>
-            </div>
-           <div class="small-2 columns">
-          </div>
-
-          <p></p>
-
-        <div class="medium-4 medium-centered columns">
-          <div>
-            <label for="text">Your text:</label>
-            <input type="text" name="text" placeholder="type your text here" required/>
-          </div>  
         </div>
-          <p></p>
-          <button class="button" type="submit">Send</button> 
-          <p></p>
-        </form>
-     </div>
- </div>
+  </div>
 </div>
 {% endblock %}

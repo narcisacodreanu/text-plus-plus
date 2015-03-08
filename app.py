@@ -17,7 +17,7 @@ from nltk import word_tokenize,pos_tag
 from twilio.rest import TwilioRestClient
 
 app = Flask(__name__)
-app.config["DEBUG"] = False  # Only include this while you are testing your app
+app.config["DEBUG"] = True  # Only include this while you are testing your app
 
 sampleText = "Today I went to the zoo!"
 
@@ -54,12 +54,12 @@ def scrapeRhymeZone(text):
 			finalString += i + " "
 	return finalString + last_punct
 
-def sendText(text, mediaURL):
+def sendText(text, mediaURL, phone_number):
 	ACCOUNT_SID = "AC591d7f09e4a2c9c028c89d4f40488f49" 
 	AUTH_TOKEN = "68c447907fe59e086289a9c914ccce47"
 	client =  TwilioRestClient(ACCOUNT_SID, AUTH_TOKEN)
 	client.messages.create(
-			to="5169966173", 
+			to="+" + phone_number, 
 			from_="+15168743771",
 			body=text,
 			media_url=mediaURL
@@ -83,7 +83,6 @@ def getNoun(sampleText):
 	return noun
 	
 print gifUrlGenerator(getNoun(sampleText))
-print(sendText(scrapeRhymeZone(sampleText), gifUrlGenerator(getNoun(sampleText))))
 
 #.d~ a , .d , font b a
 
@@ -91,6 +90,20 @@ print(sendText(scrapeRhymeZone(sampleText), gifUrlGenerator(getNoun(sampleText))
 def home():
 #return "Hello World"
 	return render_template('hello.html')
+
+@app.route("/done", methods=["GET", "POST"])
+def text():
+	if request.method == "POST":
+		print("here")
+		phone_number = request.form["user_search"]
+		text = request.form["text"]
+		rhymedText = scrapeRhymeZone(text)
+		gif_URL = gifUrlGenerator(getNoun(text))
+		sendText(rhymedText,gif_URL, phone_number)
+		return render_template("done.html", originalText=text,rhymedText=rhymedText, gif=gif_URL, phone=phone_number)
+	else:
+		return render_template("done.html")
+	return render_template("done.html")
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0")
