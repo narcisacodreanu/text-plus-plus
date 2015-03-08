@@ -5,5 +5,6 @@ sudo apt-get install -y vim
 sudo pip install flask
 sudo pip install requests
 sudo pip install beautifulsoup4
+sudo pip install twilio
 
 echo hello
